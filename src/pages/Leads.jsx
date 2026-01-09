@@ -40,11 +40,7 @@ setLeads(res.results || res.leads || []);
 
   return (
     <div>
-      <nav style={{ marginBottom: 20 }}>
-        <Link to="/leads">Leads</Link> |{" "}
-        <Link to="/destinations">Destinations</Link>
-      </nav>
-
+ 
       <h1>Leads</h1>
 
       <div style={{ marginBottom: 20 }}>

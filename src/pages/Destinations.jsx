@@ -69,12 +69,7 @@ const rows = res.results || res.destinations || [];
 
   return (
     <div>
-      <nav style={{ marginBottom: 20 }}>
-        <Link to="/leads">Leads</Link> |{" "}
-        <Link to="/destinations">Destinations</Link>
-      </nav>
-
-      <h1>Destinations</h1>
+         <h1>Destinations</h1>
 
       {error && <div style={{ color: "red" }}>{error}</div>}
 
