@@ -18,16 +18,20 @@ export default function Destinations() {
     setError("");
     try {
       const res = await listDestinations();
+// inside load()
+
 const rows = res.results || res.destinations || [];
- const normalized = rows.map((d) => ({
+const normalized = rows.map((d) => ({
   ...d,
-  enabled: !!d.enabled,
-   config:
-   typeof d.config_json === "string"
-   ? JSON.parse(d.config_json || "{}")
-    : (d.config || {}),
-    }));
-    setItems(normalized);
+  // Worker returns destination_type + is_enabled
+  type: d.destination_type ?? d.type ?? "",
+  enabled: Boolean((d.is_enabled ?? d.enabled) ? 1 : 0),
+  config:
+    typeof d.config_json === "string"
+      ? JSON.parse(d.config_json || "{}")
+      : (d.config || {}),
+}));
+setItems(normalized);
     } catch (e) {
       setError(e.message || "Failed to load destinations");
     }
@@ -37,12 +41,12 @@ const rows = res.results || res.destinations || [];
     load();
   }, []);
 
-  function startEdit(d) {
-    setEditing(d.id);
-    setType(d.type || "");
-    setConfig(JSON.stringify(d.config || {}, null, 2));
-    setEnabled(!!d.enabled);
-  }
+function startEdit(d) {
+  setEditing(d.id);
+  setType(d.destination_type ?? d.type ?? "");
+  setConfig(JSON.stringify(d.config || {}, null, 2));
+  setEnabled(Boolean((d.is_enabled ?? d.enabled) ? 1 : 0));
+}
 
   async function save(id) {
     try {
