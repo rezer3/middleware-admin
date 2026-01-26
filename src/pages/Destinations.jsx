@@ -5,7 +5,12 @@ import {
   updateDestination,
   sendTestToDestination,
 } from "../lib/api";
-
+const DESTINATION_TYPES = [
+  { value: "webhook", label: "Webhook" },
+  { value: "hubspot_contacts", label: "HubSpot Contacts" },
+  { value: "mailgun_email", label: "Mailgun (internal notify)" },
+  { value: "sendpulse_client_email", label: "SendPulse (client email)" }
+];
 export default function Destinations() {
   const [items, setItems] = useState([]);
   const [error, setError] = useState("");
@@ -90,8 +95,21 @@ function startEdit(d) {
         <tbody>
           {items.map((d) => (
             <tr key={d.id}>
-              <td>{d.id}</td>
-              <td>{d.type}</td>
+             <td>{d.name || d.id}</td>
+             <td>
+  {editing === d.id ? (
+    <select value={type} onChange={(e) => setType(e.target.value)}>
+      <option value="">Select…</option>
+      {DESTINATION_TYPES.map((t) => (
+        <option key={t.value} value={t.value}>
+          {t.label}
+        </option>
+      ))}
+    </select>
+  ) : (
+    d.type
+  )}
+</td>
               <td>{d.enabled ? "Yes" : "No"}</td>
               <td>
                 {editing === d.id ? (
