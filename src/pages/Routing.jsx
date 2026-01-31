@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { listFunnels, listRoutes, listDestinations } from "../api";
+import { listFunnels, listRoutes, listDestinations } from "../lib/api.js";
 
 export default function Routing() {
   const [funnels, setFunnels] = useState([]);
