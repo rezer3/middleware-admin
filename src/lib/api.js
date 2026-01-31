@@ -52,3 +52,35 @@ export function sendTestToDestination(id) {
     method: "POST",
   });
 }
+// Funnels
+export function listFunnels() {
+  return apiFetch("/admin/funnels");
+}
+
+export function upsertFunnel(key, body) {
+  // if key is provided: PUT /admin/funnels/:key, else POST /admin/funnels
+  if (key) return apiFetch(`/admin/funnels/${encodeURIComponent(key)}`, { method: "PUT", body: JSON.stringify(body) });
+  return apiFetch("/admin/funnels", { method: "POST", body: JSON.stringify(body) });
+}
+
+export function deleteFunnel(key) {
+  return apiFetch(`/admin/funnels/${encodeURIComponent(key)}`, { method: "DELETE" });
+}
+
+// Routes
+export function listRoutes(funnelKey) {
+  const qs = funnelKey ? `?funnel_key=${encodeURIComponent(funnelKey)}` : "";
+  return apiFetch(`/admin/routes${qs}`);
+}
+
+export function createRoute(body) {
+  return apiFetch("/admin/routes", { method: "POST", body: JSON.stringify(body) });
+}
+
+export function updateRoute(id, body) {
+  return apiFetch(`/admin/routes/${encodeURIComponent(id)}`, { method: "PUT", body: JSON.stringify(body) });
+}
+
+export function deleteRoute(id) {
+  return apiFetch(`/admin/routes/${encodeURIComponent(id)}`, { method: "DELETE" });
+}
