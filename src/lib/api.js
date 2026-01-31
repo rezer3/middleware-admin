@@ -1,3 +1,5 @@
+//filepath: /Users/ramonrootharam/middlewareui/middleware-admin/src/lib/api.js
+
 const API_BASE = import.meta.env.VITE_API_BASE || "http://127.0.0.1:8787";
 
 function getToken() {
@@ -9,11 +11,11 @@ async function apiFetch(path, options = {}) {
 
   const res = await fetch(`${API_BASE}${path}`, {
     ...options,
-    headers: {
-      "content-type": "application/json",
-      ...(token ? { authorization: `Bearer ${token}` } : {}),
-      ...(options.headers || {}),
-    },
+   headers: {
+  ...(options.headers || {}),
+  ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  "content-type": "application/json",
+},
   });
 
   if (!res.ok) {
@@ -55,6 +57,17 @@ export function sendTestToDestination(id) {
 // Funnels
 export function listFunnels() {
   return apiFetch("/admin/funnels");
+}
+
+export async function listProviderKeys() {
+  return await apiFetch("/admin/provider-keys", { method: "GET" });
+}
+
+export async function upsertProviderKey(provider, api_key) {
+  return await apiFetch(`/admin/provider-keys/${encodeURIComponent(provider)}`, {
+    method: "PUT",
+    body: JSON.stringify({ api_key }),
+  });
 }
 
 export function upsertFunnel(key, body) {

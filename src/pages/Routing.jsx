@@ -1,3 +1,4 @@
+//filepath: /Users/ramonrootharam/middlewareui/middleware-admin/src/pages/Routing.jsx
 import React, { useEffect, useMemo, useState } from "react";
 import {
   listFunnels,
@@ -6,6 +7,8 @@ import {
   createRoute,
   updateRoute,
   deleteRoute,
+  listProviderKeys,
+  upsertProviderKey,
 } from "../lib/api.js";
 
 export default function Routing() {
@@ -17,6 +20,15 @@ export default function Routing() {
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
+
+  const [providerKeys, setProviderKeys] = useState([]);
+const [mailgunKey, setMailgunKey] = useState("");
+const [pkMsg, setPkMsg] = useState("");
+
+async function refreshProviderKeys() {
+  const res = await listProviderKeys();
+  setProviderKeys(res?.results || []);
+}
 
   // Add Route form
   const [newDestId, setNewDestId] = useState("");
@@ -54,7 +66,9 @@ export default function Routing() {
       } finally {
         setLoading(false);
       }
+   try { await refreshProviderKeys(); } catch (e) { setErr(e?.message || String(e)); }
     })();
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -183,7 +197,93 @@ export default function Routing() {
             {err}
           </div>
         )}
+<div style={{ marginTop: 16, borderTop: "1px solid #f1f5f9", paddingTop: 12 }}>
+  <div style={{ fontWeight: 800, marginBottom: 8 }}>Provider Keys</div>
 
+  <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+    <div style={{ minWidth: 260 }}>
+      <div style={{ fontSize: 12, opacity: 0.7, marginBottom: 4 }}>Mailgun API Key</div>
+      <input
+        type="password"
+        value={mailgunKey}
+        onChange={(e) => setMailgunKey(e.target.value)}
+        placeholder="key-xxxxxxxxxxxxxxxxxxxxxxxx"
+        style={{ padding: "8px 10px", borderRadius: 8, border: "1px solid #e5e7eb", width: 320 }}
+        disabled={busy}
+      />
+    </div>
+
+    <button
+      disabled={busy || !mailgunKey.trim()}
+      onClick={async () => {
+        try {
+          setBusy(true);
+          setPkMsg("");
+          await upsertProviderKey("mailgun", mailgunKey.trim());
+          setMailgunKey("");
+          await refreshProviderKeys();
+          setPkMsg("Saved.");
+        } catch (e) {
+          setPkMsg(e?.message || String(e));
+        } finally {
+          setBusy(false);
+        }
+      }}
+      style={{
+        marginTop: 18,
+        padding: "9px 12px",
+        borderRadius: 10,
+        border: "1px solid #e5e7eb",
+        background: busy ? "#f8fafc" : "#fff",
+        cursor: busy ? "not-allowed" : "pointer",
+        fontWeight: 800,
+      }}
+    >
+      Save
+    </button>
+
+    <button
+      disabled={busy}
+      onClick={async () => {
+        try {
+          setBusy(true);
+          setPkMsg("");
+          await refreshProviderKeys();
+          setPkMsg("Refreshed.");
+        } catch (e) {
+          setPkMsg(e?.message || String(e));
+        } finally {
+          setBusy(false);
+        }
+      }}
+      style={{
+        marginTop: 18,
+        padding: "9px 12px",
+        borderRadius: 10,
+        border: "1px solid #e5e7eb",
+        background: busy ? "#f8fafc" : "#fff",
+        cursor: busy ? "not-allowed" : "pointer",
+        fontWeight: 800,
+        opacity: 0.85,
+      }}
+    >
+      Refresh
+    </button>
+  </div>
+
+  <div style={{ marginTop: 10, fontSize: 12, opacity: 0.8 }}>
+    Mailgun key status:{" "}
+    <strong>
+      {providerKeys.some((p) => p.provider === "mailgun") ? "set" : "not set"}
+    </strong>
+  </div>
+
+  {pkMsg && (
+    <div style={{ marginTop: 8, fontSize: 12, color: pkMsg === "Saved." || pkMsg === "Refreshed." ? "#065f46" : "#b91c1c" }}>
+      {pkMsg}
+    </div>
+  )}
+</div>
         {/* Add Route */}
         <div style={{ padding: 12, borderBottom: "1px solid #f1f5f9", display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
           <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
